@@ -1,0 +1,6 @@
+fastapi~=0.110.0
+aio-pika
+pydantic~=2.6.3
+uvicorn
+requests
+python-dotenv
