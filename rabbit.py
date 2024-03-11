@@ -93,7 +93,7 @@ def router(fastapi_router,
                 path_new = '/'.join(path.split("/")[:-1] + [kwargs[path_param]])
             else:
                 path_new = path
-            if path_new == "/user/register":
+            if path_new == "/user/register" or (path_new == "/user/Managers" and method == "POST"):
                 role_check: int = kwargs["register"].dict()["role"] + 1
                 if role_check == 2:
                     role_check = 0

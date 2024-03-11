@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header
 
 from rabbit import router
-from user_service.schemas import Login, Register, Organization, PathDataOrg
+from user_service.schemas import Login, Register, Organization, PathDataOrg, Manager, PathManager
 
 user_router = APIRouter()
 
@@ -106,6 +106,55 @@ async def register_user(id: str,
         path_param="id", json_data=["path_data"])
 async def register_user(id: str,
                         path_data: PathDataOrg,
+                        access_token: str | None = Header(default=None),
+                        refresh_token: str | None = Header(default=None),
+                        email: str | None = Header(default=None),
+                        password: str | None = Header(default=None)):
+    pass
+
+
+@router(fastapi_router=user_router.get, method="GET", path="/user/Managers", role=1)
+async def register_user(access_token: str | None = Header(default=None),
+                        refresh_token: str | None = Header(default=None),
+                        email: str | None = Header(default=None),
+                        password: str | None = Header(default=None)):
+    pass
+
+
+@router(fastapi_router=user_router.get, method="GET", path="/user/Managers/{id}", role=1,
+        path_param="id")
+async def register_user(id: str,
+                        access_token: str | None = Header(default=None),
+                        refresh_token: str | None = Header(default=None),
+                        email: str | None = Header(default=None),
+                        password: str | None = Header(default=None)):
+    pass
+
+
+@router(fastapi_router=user_router.post, method="POST", path="/user/Managers", role=1,
+        json_data=["organization"])
+async def register_user(register: Manager,
+                        access_token: str | None = Header(default=None),
+                        refresh_token: str | None = Header(default=None),
+                        email: str | None = Header(default=None),
+                        password: str | None = Header(default=None)):
+    pass
+
+
+@router(fastapi_router=user_router.delete, method="DELETE", path="/user/Managers/{id}", role=1,
+        path_param="id")
+async def register_user(id: str,
+                        access_token: str | None = Header(default=None),
+                        refresh_token: str | None = Header(default=None),
+                        email: str | None = Header(default=None),
+                        password: str | None = Header(default=None)):
+    pass
+
+
+@router(fastapi_router=user_router.patch, method="PATCH", path="/user/Managers/{id}", role=1,
+        path_param="id", json_data=["path_data"])
+async def register_user(id: str,
+                        path_data: PathManager,
                         access_token: str | None = Header(default=None),
                         refresh_token: str | None = Header(default=None),
                         email: str | None = Header(default=None),

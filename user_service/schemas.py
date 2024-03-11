@@ -34,3 +34,20 @@ class PathDataOrg(BaseModel):
     path: str
     op: str
     value: str
+
+
+class Manager(BaseModel):
+    email: str
+    password: str
+    role: int
+    medcentreId: str
+    firstName: str
+    lastName: str
+    phone: str
+    avatarUrl: str
+    status: str
+
+
+class PathManager(BaseModel):
+    patchUserDoc: list
+    patchManagerDoc:list
