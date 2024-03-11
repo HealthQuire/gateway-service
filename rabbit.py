@@ -61,6 +61,7 @@ async def _check_tokens(access: str | None, refresh: str | None, email: str | No
 
 
 async def send_request_to_queue(message: dict) -> tuple[dict, int]:
+    print(CONNECTION_STR)
     connection = await aio_pika.connect_robust(CONNECTION_STR)
 
     async with connection:
