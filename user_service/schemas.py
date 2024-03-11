@@ -22,3 +22,9 @@ class Register(BaseModel):
     phone: str
     avatarUrl: str
     status: str
+
+
+class Organization(BaseModel):
+    ownerId: str
+    name: str
+    status: str

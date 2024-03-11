@@ -76,7 +76,8 @@ def router(fastapi_router,
            path: str,
            status_code: int = status.HTTP_200_OK,
            json_data: list = None,
-           role: int = 0):
+           role: int = 0,
+           path_param: str = None):
     fastapi_router = fastapi_router(path, status_code=status_code)
 
     def wrapper(endpoint):
@@ -87,7 +88,11 @@ def router(fastapi_router,
                             email: str | None = Header(default=None),
                             password: str | None = Header(default=None),
                             **kwargs):
-            if path == "/user/register":
+            if path_param is not None:
+                path_new = '/'.join(path.split("/")[:-1] + [kwargs[path_param]])
+            else:
+                path_new = path
+            if path_new == "/user/register":
                 role_check: int = kwargs["register"].dict()["role"] + 1
                 if role_check == 2:
                     role_check = 0
@@ -114,7 +119,7 @@ def router(fastapi_router,
                                         headers={"access_token": access_token,
                                                  "refresh-token": refresh_token})
 
-            message = {"method": method, "path": path}
+            message = {"method": method, "path": path_new}
             if json_data is not None:
                 message["json_data"] = dict()
                 for json_name in json_data:
@@ -135,7 +140,3 @@ def router(fastapi_router,
             return JSONResponse(response_data, headers=resp_header)
 
     return wrapper
-
-
-if __name__ == '__main__':
-    print(_check_tokens(None, None, None, None))
