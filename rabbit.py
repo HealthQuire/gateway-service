@@ -13,14 +13,14 @@ CONNECTION_STR = environ.get("CONNECTION_STR")
 AUTHORIZATION_URL = environ.get("AUTHORIZATION_URL")
 
 
-async def _try_decode_token(access: str | None) -> int:
+async def _try_decode_token(access: str | None) -> tuple:
     if access is None:
-        return 0
+        return 0, None
     res = requests.post(AUTHORIZATION_URL + "/decode_token", headers={"access-token": access})
     if res.status_code == status.HTTP_401_UNAUTHORIZED:
-        return 0
+        return 0, None
     data = res.json()
-    return data["user_role"]
+    return data["user_role"], data["user_id"]
 
 
 async def _try_refresh_token(access: str | None, refresh: str | None):
@@ -47,17 +47,18 @@ async def _try_get_tokens(email: str | None, password: str | None):
 
 async def _check_tokens(access: str | None, refresh: str | None, email: str | None,
                         password: str | None) -> tuple:
-    role = await _try_decode_token(access)
+    role, user_id = await _try_decode_token(access)
     if role != 0:
-        return role, access, refresh
+        return role, user_id, access, refresh
 
     access_try, refresh_try = await _try_refresh_token(access, refresh)
-    role = await _try_decode_token(access_try)
+    role, user_id = await _try_decode_token(access_try)
     if role != 0:
-        return role, access_try, refresh_try
+        return role, user_id, access_try, refresh_try
 
     access_try, refresh_try = await _try_get_tokens(email, password)
-    return await _try_decode_token(access_try), access_try, refresh_try
+    role, user_id = await _try_decode_token(access_try)
+    return role, user_id, access_try, refresh_try
 
 
 async def send_request_to_queue(message: dict) -> tuple[dict, int]:
@@ -100,14 +101,17 @@ def router(fastapi_router,
                 role_check = role
 
             if role_check != 0:
-                user_role, new_access_token, new_refresh_token = await _check_tokens(access_token,
-                                                                                     refresh_token,
-                                                                                     email,
-                                                                                     password)
+                user_role, user_id, new_access_token, new_refresh_token = await _check_tokens(
+                    access_token,
+                    refresh_token,
+                    email,
+                    password)
                 access_token = new_access_token
                 refresh_token = new_refresh_token
                 print(user_role)
-                if user_role < role_check:
+                if user_role < role_check or (
+                        path == "/user/Users/{id}" and method != "GET" and user_id != kwargs[
+                    path_param]):
                     resp_code = status.HTTP_401_UNAUTHORIZED if user_role == 0 \
                         else status.HTTP_403_FORBIDDEN
                     if access_token is None:

@@ -28,3 +28,9 @@ class Organization(BaseModel):
     ownerId: str
     name: str
     status: str
+
+
+class PathDataOrg(BaseModel):
+    path: str
+    op: str
+    value: str
